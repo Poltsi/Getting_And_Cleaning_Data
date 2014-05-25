@@ -3,7 +3,8 @@
 ####################################################################################
 ## Includes
 
-# Reshape is used by the last part where we create the mean values
+# Reshapes functions are used by the last part where we create the mean values
+require( reshape )
 require( reshape2 )
 
 ####################################################################################
@@ -80,12 +81,25 @@ cleansedata = function( datatype, featurelist, datadir, datafiles ) {
 ####################################################################################
 ## Main
 
+# Attempt to detect what operating system we have
+ostype = tolower( Sys.info()[ 1 ] )
+
+if( ostype == "linux" ) {
+    httpmethod = "curl"
+} else if( ostype == "windows" ) {
+    httpmethod = "internal"
+} else {
+    print( "WARNING: You are probably running on a Mac or other Unix which has not been tested" )
+    print( "This means that the script may fail as I have not been able to verify the functionality" )
+    print( "on that particular platform. If you break it, you may keep both pieces, You have been warned :-)" )
+}
+
 # Check if the zip file already exists
 # Since file.exists can return a vector which in turn causes a warning to be emitted,
 # we circumvent this by a kluge where we count the amount of 1's in the answer
 if( ! sum( file.exists( zip.file ) ) )
 {
-    download.file( data.url, zip.file, method = "curl" )
+    download.file( data.url, zip.file, method = httpmethod )
 }
 
 # Check if the data dir exists
