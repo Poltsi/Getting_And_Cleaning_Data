@@ -1,5 +1,6 @@
 ## This script takes the dataset from
-
+####################################################################################
+## Variables
 data.url   = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 zip.file   = "UCI_HAR_Dataset.zip"
 zip.dir    = "UCI HAR Dataset"
@@ -22,37 +23,49 @@ rownames( data.files ) = c( "activitylabel",
                             "trainy" )
 # Let's also set the colnames, because the printout of data.files is otherwise ugly
 colnames( data.files ) = c( "value" )
+
+####################################################################################
+## Functions
+
+# missingfiles checks whether there are any critical files missing from
+# the given directory
+
+missingfiles = function( filedir, filelist ) {
+    for( f in filelist )
+    {
+        tmpfile = paste( filedir, f, sep = "/" )
+        
+        if( ! file.exists( tmpfile ) )
+        {
+            return( TRUE )
+        }
+    }
+
+    FALSE
+}
+
+####################################################################################
+## Main
+
 # Check if the zip file already exists
 
 if( ! file.exists( zip.file ) )
 {
     download.file( data.url, zip.file, method = "curl" )
-} else {
-    # We have a internal function which checks whether there are
-    # any critical files missing from the given directory
-    missingfiles = function( filedir, filelist ) {
-        for( f in filelist )
-        {
-            if( ! file.exists( paste( filedir, f, sep = "/" ) ) )
-            {
-                return( TRUE )
-            }
-        }
+}
 
-        FALSE
-    }
+# Check if the data dir exists
 
-    # Check if the data dir exists
-    if( ! file.exists( zip.dir ) | missingfiles( zip.dir, data.files ) )
-    {
-        unzip( zip.file, overwrite = TRUE )
-    }
+if( ( ! file.exists( zip.dir ) ) | missingfiles( zip.dir, data.files ) )
+{
+    unzip( zip.file, overwrite = TRUE )
+}
 
-    # Make sure we have the required files also
-    if( missingfiles( zip.dir, data.files ) )
-    {
-        stop( "ERROR: One of several of the required files are missing, unable to continue" )
-    }
+# Make sure we have the required files also
+
+if( missingfiles( zip.dir, data.files ) )
+{
+    stop( "ERROR: One of several of the required files are missing, unable to continue" )
 }
 
 ############################ Read the data ############################
