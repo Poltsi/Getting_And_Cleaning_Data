@@ -45,7 +45,7 @@ missingfiles = function( filedir, filelist ) {
     {
         tmpfile = paste( filedir, f, sep = "/" )
         
-        if( ! file.exists( tmpfile ) )
+        if( ! sum( file.exists( tmpfile ) ) )
         {
             return( TRUE )
         }
@@ -71,23 +71,26 @@ cleansedata = function( datatype, featurelist, datadir, datafiles ) {
     colnames( s ) = c( "subjectid" )
     # Drop other than the mean and std columns
     x = x[ , featuresindex ]
-    # Then add the activity and subject id and return the whole thing
-    cbind( x, y, s )
+    # Then add the activity and subject id and return the whole thing,
+    # note the order, we get first the subject ID, activity ID, and then
+    # the accelerometer measurements
+    cbind( s, y, x )
 }
 
 ####################################################################################
 ## Main
 
 # Check if the zip file already exists
-
-if( ! file.exists( zip.file ) )
+# Since file.exists can return a vector which in turn causes a warning to be emitted,
+# we circumvent this by a kluge where we count the amount of 1's in the answer
+if( ! sum( file.exists( zip.file ) ) )
 {
     download.file( data.url, zip.file, method = "curl" )
 }
 
 # Check if the data dir exists
 
-if( ( ! file.exists( zip.dir ) ) | missingfiles( zip.dir, data.files ) )
+if( ( ! sum( file.exists( zip.dir ) ) ) | missingfiles( zip.dir, data.files ) )
 {
     unzip( zip.file, overwrite = TRUE )
 }
@@ -116,39 +119,38 @@ completedata = rbind( testall, trainall )
 ## Replace activity IDs with labels
 # Read the activity labels
 activitylabels = read.table(paste( zip.dir, data.files[ "activitylabel", "value" ], sep = "/" ),
-                       col.names = c( "id", "activitytype" ) )
+                       col.names = c( "id", "label" ) )
 # Clean up the label strings, lowercase and no underscores
-activitylabels[ , "activitytype" ] = tolower(activitylabels[ , "activitytype" ] )
-activitylabels[ , "activitytype" ] = gsub("_", "", activitylabels[ , "activitytype" ] )
+activitylabels[ , "label" ] = tolower(activitylabels[ , "label" ] )
+activitylabels[ , "label" ] = gsub("_", "", activitylabels[ , "label" ] )
 
-# Replace the IDs with the label, we do this in two steps, first we merge the
-# activity labels to the complete data based on IDs, then drop the id column
-completedata = merge( x    = completedata,
-                      y    = activitylabels,
-                      by.x = "activityid",
-                      by.y = "id",
-                      all.x  = TRUE,
-                      all.y  = FALSE )
+# Replace the IDs with the label, we do this in a loop as it is the easiest way
+# to do a in-place replacement in the dataframe
+for( idx in 1:6 )
+{
+    completedata[, "activityid" ][ completedata[, "activityid" ] == idx ] = activitylabels[ idx, "label" ]
+}
 
-completedata = subset( completedata, select = -activityid )
+# Then rename the activityid column as it now contains the actual type
+colnames( completedata )[ 2 ] = "activitytype"
 
 # Save this tidy data to a file
 write.table( completedata,
-             file = tidydata.full,
-             append = FALSE,
-             row.names = FALSE)
+             file      = tidydata.full,
+             append    = FALSE,
+             row.names = FALSE )
 
 # Create a separate dataset which contains the mean values for each activity and subject
 # First define which will be our identity variables
 activitycolums = c( "subjectid", "activitytype" )
 meltdata       = melt( completedata, id = activitycolums, measurevars = -activitycolums )
-meandata       = dcast( meltdata, activitytype + subjectid ~ variable, mean )
+meandata       = dcast( meltdata, subjectid + activitytype  ~ variable, mean )
 
 # Save this tidy data to a file
 write.table( meandata,
-             file = tidydata.mean,
-             append = FALSE,
-             row.names = FALSE)
+             file      = tidydata.mean,
+             append    = FALSE,
+             row.names = FALSE )
 
 # One can verify the result of this melt and dcast with the following function
 #
