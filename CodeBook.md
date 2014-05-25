@@ -18,7 +18,7 @@ Furthermore the raw data is separated into two main category, test and train-dat
 
 The data is manipulated in the following manner:
 
-1, Read in the test and train data, create for each a combined dataset which contains both the subject and the activity ID. In the process we also beautify the column names so that they do not contain dashes or parenthesis and remove other than those that are either mean, or standard deviation columns
+1. Read in the test and train data, create for each a combined dataset which contains both the subject and the activity ID. In the process we also beautify the column names so that they do not contain dashes or parenthesis and remove other than those that are either mean, or standard deviation columns
 2. Combine the test and train data by concatenating both datasets to a new one
 3. Replace the activity IDs with actual labels which are also cleaned up, setting to lowercase and removing any underscores
 4. The tidy data is written to a file
@@ -35,6 +35,7 @@ There is also a commented-out function at the end which can be used to test the 
 
 There are two files generated, each containing the same columns. The two first columns are added to the sensory data and indicates the subject as a index, and activity label.
 
+```
 "subjectid"
 "activitytype"
 "tbodyaccmeanx"
@@ -103,5 +104,6 @@ There are two files generated, each containing the same columns. The two first c
 "fbodybodygyromagstd"
 "fbodybodygyrojerkmagmean"
 "fbodybodygyrojerkmagstd"
+```
 
 For detailed description on the accelerometer variables, see the README.txt included in the source data zip file.
