@@ -2,6 +2,34 @@
 
 This repo is created as a part of the Getting and cleaning data-course project at Coursera (https://class.coursera.org/getdata-003/).
 
+## Prerequisites
+
+In order to run the script you need to have a couple of things installed on your computer.
+
+### R
+
+Obviously, as this is a R-script
+
+### reshape R-library
+
+This is necessary as we use the melt-function. To install this execute the following command in the R prompt:
+
+```
+install.packages( "reshape" )
+```
+
+This will most probably install additional dependencies such as plyr, stringr and Rcpp.
+
+### reshape2 R-library
+
+This is necessary as we use the dcast-function. To install this execute the following command in the R prompt:
+
+```
+install.packages( "reshape2" )
+```
+
+This will most probably install additional dependencies such as plyr, stringr and Rcpp.
+
 ## Execution
 
 To run the script you can either execute the following command on command line:
@@ -22,4 +50,4 @@ Once the script is finished, two new files should be available in the working di
 
 ## Environments
 
-The R script has been developed on Linux, and also tested on Windows, Mac may work as it is somewhat similar to Linux.
+The R script has been developed on Linux, and also tested on Windows, Mac may work as it is somewhat similar to Linux, but the script will emit a warning (as it does for any other OS too).
