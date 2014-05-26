@@ -8,7 +8,7 @@ In order to run the script you need to have a couple of things installed on your
 
 ### R
 
-Obviously, as this is a R-script
+Obviously, as this is a R-script. Version 3.1.0 was used both in Linux as well as Windows.
 
 ### reshape R-library
 
